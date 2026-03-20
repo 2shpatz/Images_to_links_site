@@ -1,0 +1,29 @@
+services:
+  # ── Static site (nginx) ──────────────────────────────────
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+    container_name: aliexpress-deals-site
+    volumes:
+      - site-data:/usr/share/nginx/html
+
+  # ── Management API (FastAPI) ─────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8082:8000"
+    restart: unless-stopped
+    container_name: aliexpress-deals-api
+    environment:
+      - SITE_DIR=/app/site
+    volumes:
+      - ./site:/app/site
+
+volumes:
+  site-data:
