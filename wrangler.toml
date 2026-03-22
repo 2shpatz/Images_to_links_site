@@ -1,0 +1,12 @@
+name = "aliexpress-deals-site"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = "site"
+
+# KV namespace for storing site data (categories, images, products)
+# After first deploy, create the KV namespace and bind it:
+#   wrangler pages kv create SITE_DATA
+# Then add the binding in Cloudflare Dashboard → Pages → Settings → Bindings
+# Or use wrangler.toml:
+[[kv_namespaces]]
+binding = "SITE_DATA"
+id = ""  # Fill after creating: wrangler kv namespace create "SITE_DATA"
