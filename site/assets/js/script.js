@@ -230,14 +230,19 @@ function openModal(imageData) {
     modalTitle.textContent = imageData.title;
     modalDesc.textContent = imageData.description;
 
-    // Build product links
+    // Build product links and hotspots
     modalProducts.innerHTML = '';
-    imageData.products.forEach(product => {
+    const hotspotContainer = document.getElementById('hotspot-container');
+    hotspotContainer.innerHTML = '';
+
+    imageData.products.forEach((product, idx) => {
+        // 1. Create Product Link
         const link = document.createElement('a');
         link.className = 'product-link';
         link.href = product.url;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
+        link.dataset.index = idx;
 
         link.innerHTML = `
             <div class="product-link-icon">${product.icon}</div>
@@ -247,6 +252,45 @@ function openModal(imageData) {
             </div>
             <div class="product-link-arrow">←</div>
         `;
+
+        // 2. Create Hotspot (if coordinates exist)
+        let hotspot = null;
+        if (product.coords) {
+            hotspot = document.createElement('div');
+            hotspot.className = 'hotspot';
+            hotspot.style.left = `${product.coords.x}%`;
+            hotspot.style.top = `${product.coords.y}%`;
+            hotspot.dataset.index = idx;
+            hotspotContainer.appendChild(hotspot);
+            
+            // Show hotspots with a slight delay
+            setTimeout(() => hotspot.classList.add('visible'), 300 + (idx * 100));
+
+            // Hotspot Hover -> Link Glow
+            hotspot.addEventListener('mouseenter', () => {
+                hotspot.classList.add('active');
+                link.classList.add('active');
+                link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+            hotspot.addEventListener('mouseleave', () => {
+                hotspot.classList.remove('active');
+                link.classList.remove('active');
+            });
+            hotspot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open(product.url, '_blank');
+            });
+        }
+
+        // Link Hover -> Hotspot Glow
+        link.addEventListener('mouseenter', () => {
+            link.classList.add('active');
+            if (hotspot) hotspot.classList.add('active');
+        });
+        link.addEventListener('mouseleave', () => {
+            link.classList.remove('active');
+            if (hotspot) hotspot.classList.remove('active');
+        });
 
         modalProducts.appendChild(link);
     });

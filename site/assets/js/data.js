@@ -27,6 +27,7 @@
  *   price  – approximate price string (e.g. "₪15–25")
  *   url    – full AliExpress affiliate link
  *   icon   – emoji icon for the product
+ *   coords – {x, y} percentage coordinates for the hotspot (0-100)
  */
 
 const SITE_DATA = {
@@ -37,50 +38,6 @@ const SITE_DATA = {
             icon: "👶",
             images: [
                 {
-                    file: "baby-room.jpg",
-                    title: "חדר תינוקות מעוצב",
-                    description: "מוצרים משלימים לחדר התינוק",
-                    products: [
-                        {
-                            name: "מנורת לילה ענן",
-                            price: "₪25–40",
-                            url: "https://www.aliexpress.com/item/example9.html",
-                            icon: "☁️"
-                        },
-                        {
-                            name: "סט מצעים לתינוק",
-                            price: "₪60–120",
-                            url: "https://www.aliexpress.com/item/example10.html",
-                            icon: "🛏️"
-                        },
-                        {
-                            name: "ארגונית צעצועים מבד",
-                            price: "₪35–60",
-                            url: "https://www.aliexpress.com/item/example3.html",
-                            icon: "🧸"
-                        }
-                    ]
-                },
-                {
-                    file: "stroller-park.jpg",
-                    title: "טיול בפארק עם עגלה",
-                    description: "עגלת תינוק ואביזרים שימושיים לטיולים",
-                    products: [
-                        {
-                            name: "מאוורר קליפס נטען USB",
-                            price: "₪20–40",
-                            url: "https://www.aliexpress.com/item/example4.html",
-                            icon: "🌀"
-                        },
-                        {
-                            name: "תיק החתלה רב-תכליתי",
-                            price: "₪50–90",
-                            url: "https://www.aliexpress.com/item/example5.html",
-                            icon: "🎒"
-                        }
-                    ]
-                },
-                {
                     file: "annotated-nursery.jpg",
                     title: "חדר תינוקות מודרני ורחב",
                     description: "מבט רחב על חדר תינוקות מעוצב עם פריטים נבחרים מ-AliExpress",
@@ -89,25 +46,29 @@ const SITE_DATA = {
                             name: "מיטת תינוק מעץ אורן טבעי",
                             price: "₪1,250",
                             url: "https://www.aliexpress.com/item/1005007129769976.html",
-                            icon: "🛏️"
+                            icon: "🛏️",
+                            coords: { x: 35, y: 65 }
                         },
                         {
                             name: "שטיח ענן רך ופרוותי",
                             price: "₪45",
                             url: "https://www.aliexpress.com/item/1005007980084828.html",
-                            icon: "☁️"
+                            icon: "☁️",
+                            coords: { x: 50, y: 85 }
                         },
                         {
                             name: "כיסא נדנדה ראטן מעוצב",
                             price: "₪1,650",
                             url: "https://www.aliexpress.com/item/1005009148075112.html",
-                            icon: "🪑"
+                            icon: "🪑",
+                            coords: { x: 75, y: 70 }
                         },
                         {
                             name: "סט מדפי ענן דקורטיביים",
                             price: "₪85",
                             url: "https://www.aliexpress.com/item/1005006821107202.html",
-                            icon: "☁️"
+                            icon: "☁️",
+                            coords: { x: 20, y: 30 }
                         }
                     ]
                 }
@@ -119,31 +80,6 @@ const SITE_DATA = {
             icon: "🍳",
             images: [
                 {
-                    file: "modern-kitchen.jpg",
-                    title: "מטבח מודרני מאובזר",
-                    description: "גאדג׳טים למטבח שיהפכו את הבישול לקל יותר",
-                    products: [
-                        {
-                            name: "קולפן ירקות רב-תכליתי",
-                            price: "₪8–15",
-                            url: "https://www.aliexpress.com/item/example6.html",
-                            icon: "🥕"
-                        },
-                        {
-                            name: "ארגונית מגירות מטבח",
-                            price: "₪20–45",
-                            url: "https://www.aliexpress.com/item/example7.html",
-                            icon: "📦"
-                        },
-                        {
-                            name: "מדחום מטבח דיגיטלי",
-                            price: "₪15–30",
-                            url: "https://www.aliexpress.com/item/example8.html",
-                            icon: "🌡️"
-                        }
-                    ]
-                },
-                {
                     file: "annotated-kitchen.jpg",
                     title: "מטבח מודרני עם מוצרים נבחרים",
                     description: "מטבח מעוצב עם פריטים שניתן למצוא ב-AliExpress, כולל סימונים על התמונה",
@@ -152,25 +88,29 @@ const SITE_DATA = {
                             name: "קומקום חשמלי מעוצב שחור מט",
                             price: "₪180",
                             url: "https://www.aliexpress.com/item/1005009283926938.html",
-                            icon: "🫖"
+                            icon: "🫖",
+                            coords: { x: 30, y: 60 }
                         },
                         {
                             name: "סט צנצנות תבלינים עם מעמד עץ",
                             price: "₪95",
                             url: "https://www.aliexpress.com/item/1005009886221452.html",
-                            icon: "🧂"
+                            icon: "🧂",
+                            coords: { x: 60, y: 55 }
                         },
                         {
                             name: "דיספנסר שמן זכוכית מעוצב",
                             price: "₪35",
                             url: "https://www.aliexpress.com/item/1005008182446725.html",
-                            icon: "🧴"
+                            icon: "🧴",
+                            coords: { x: 70, y: 65 }
                         },
                         {
                             name: "פס מגנטי לסכינים מפלדת אל-חלד",
                             price: "₪65",
                             url: "https://www.aliexpress.com/item/1005009394802008.html",
-                            icon: "🔪"
+                            icon: "🔪",
+                            coords: { x: 85, y: 40 }
                         }
                     ]
                 }
@@ -182,31 +122,6 @@ const SITE_DATA = {
             icon: "📱",
             images: [
                 {
-                    file: "desk-setup.jpg",
-                    title: "שולחן עבודה מסודר",
-                    description: "אביזרים לשולחן שישדרגו את סביבת העבודה",
-                    products: [
-                        {
-                            name: "מעמד לפטופ מתכוונן",
-                            price: "₪30–70",
-                            url: "https://www.aliexpress.com/item/example9.html",
-                            icon: "💻"
-                        },
-                        {
-                            name: "פד טעינה אלחוטי",
-                            price: "₪15–35",
-                            url: "https://www.aliexpress.com/item/example10.html",
-                            icon: "🔋"
-                        },
-                        {
-                            name: "תאורת LED לצג",
-                            price: "₪40–80",
-                            url: "https://www.aliexpress.com/item/example11.html",
-                            icon: "💡"
-                        }
-                    ]
-                },
-                {
                     file: "3d-printer-filament.jpg",
                     title: "פילמנט PETG למדפסת תלת-ממד",
                     description: "פילמנט איכותי של KINGROON במחיר מבצע מטורף",
@@ -215,7 +130,8 @@ const SITE_DATA = {
                             name: "KINGROON PETG 3D Printer Filament",
                             price: "₪150",
                             url: "https://www.aliexpress.com/item/1005004895787583.html",
-                            icon: "🖨️"
+                            icon: "🖨️",
+                            coords: { x: 50, y: 50 }
                         }
                     ]
                 },
@@ -228,7 +144,8 @@ const SITE_DATA = {
                             name: "GeekMagic Ultra Portable Smart Wifi Weather Station",
                             price: "₪7",
                             url: "https://www.aliexpress.com/item/1005006966276512.html",
-                            icon: "🌡️"
+                            icon: "🌡️",
+                            coords: { x: 50, y: 50 }
                         }
                     ]
                 }
@@ -240,52 +157,58 @@ const SITE_DATA = {
             icon: "🏠",
             images: [
                 {
-                    file: "living-room.jpg",
-                    title: "סלון מעוצב",
-                    description: "פריטי עיצוב לסלון שמשדרגים כל חלל",
+                    file: "wide-living-room-clean.jpg",
+                    title: "סלון מודרני רחב ומעוצב",
+                    description: "מבט פנורמי על סלון מודרני עם 7 פריטים נבחרים מתחת ל-100$",
                     products: [
                         {
-                            name: "כרית נוי דקורטיבית",
-                            price: "₪15–35",
-                            url: "https://www.aliexpress.com/item/example12.html",
-                            icon: "🛋️"
+                            name: "מנורת עמידה מינימליסטית",
+                            price: "₪110",
+                            url: "https://www.aliexpress.com/item/1005009692606690.html",
+                            icon: "💡",
+                            coords: { x: 34, y: 27 }
                         },
                         {
-                            name: "שעון קיר מודרני",
-                            price: "₪25–55",
-                            url: "https://www.aliexpress.com/item/example13.html",
-                            icon: "🕐"
-                        }
-                    ]
-                },
-                {
-                    file: "modern-living-room.jpg",
-                    title: "סלון מודרני ונעים",
-                    description: "עיצוב סלון מודרני עם מגוון פריטים מעוצבים מ-AliExpress",
-                    products: [
+                            name: "שעון קיר נורדי גדול 80 ס״מ",
+                            price: "₪156",
+                            url: "https://www.aliexpress.com/item/1005008525381412.html",
+                            icon: "🕐",
+                            coords: { x: 57, y: 30 }
+                        },
                         {
-                            name: "מנורת עמידה מינימליסטית שחורה",
+                            name: "ספה מודרנית רחבה",
                             price: "₪350",
-                            url: "https://www.aliexpress.com/item/1005010352775247.html",
-                            icon: "💡"
+                            url: "https://www.aliexpress.com/w/wholesale-modern-sofa.html",
+                            icon: "🛋️",
+                            coords: { x: 50, y: 55 }
                         },
                         {
-                            name: "סט כדים קרמיים דקורטיביים",
-                            price: "₪85",
-                            url: "https://www.aliexpress.com/item/1005006614170710.html",
-                            icon: "🏺"
+                            name: "שולחן קפה מעץ טבעי",
+                            price: "₪280",
+                            url: "https://www.aliexpress.com/w/wholesale-modern-wood-coffee-table.html",
+                            icon: "☕",
+                            coords: { x: 43, y: 72 }
                         },
                         {
-                            name: "כרבולית סרוגה עבה ונעימה",
-                            price: "₪75",
-                            url: "https://www.aliexpress.com/item/1005008182446725.html",
-                            icon: "🧶"
-                        },
-                        {
-                            name: "אמנות קיר גיאומטרית מודרנית",
+                            name: "שטיח שאגי לבן ורך",
                             price: "₪120",
-                            url: "https://www.aliexpress.com/item/1005006022670486.html",
-                            icon: "🖼️"
+                            url: "https://www.aliexpress.com/w/wholesale-plush-white-area-rug.html",
+                            icon: "🧶",
+                            coords: { x: 40, y: 85 }
+                        },
+                        {
+                            name: "סט 3 כדים קרמיים",
+                            price: "₪70",
+                            url: "http://www.aliexpress.com/w/wholesale-ceramic-vase-sets.html",
+                            icon: "🏺",
+                            coords: { x: 11, y: 54 }
+                        },
+                        {
+                            name: "כרבולית סרוגה עבה",
+                            price: "₪60",
+                            url: "https://www.aliexpress.com/i/1005007387488589.html",
+                            icon: "🧣",
+                            coords: { x: 78, y: 60 }
                         }
                     ]
                 }
