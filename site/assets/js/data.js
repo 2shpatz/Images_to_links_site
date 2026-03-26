@@ -38,58 +38,58 @@ const SITE_DATA = {
             icon: "🏠",
             images: [
                 {
-                    file: "wide-living-room-clean.jpg",
-                    title: "סלון מודרני רחב ומעוצב",
-                    description: "מבט פנורמי על סלון מודרני עם 7 פריטים נבחרים מתחת ל-100$",
+                    file: "perfect-match-living-room.jpg",
+                    title: "סלון מודרני מינימליסטי",
+                    description: "סלון מעוצב עם 7 פריטים מ-AliExpress שנבחרו בקפידה ויוצרו לתמונה זו",
                     products: [
                         {
-                            name: "מנורת עמידה מינימליסטית",
-                            price: "₪110",
+                            name: "מנורת עמידה LED ספירלה",
+                            price: "$50.56",
                             url: "https://www.aliexpress.com/item/1005009692606690.html",
                             icon: "💡",
-                            coords: { x: 34, y: 27 }
+                            coords: { x: 18, y: 50 }
                         },
                         {
-                            name: "שעון קיר נורדי גדול 80 ס״מ",
-                            price: "₪156",
+                            name: "שעון קיר נורדי זהב ושחור",
+                            price: "$31.30",
                             url: "https://www.aliexpress.com/item/1005008525381412.html",
                             icon: "🕐",
-                            coords: { x: 57, y: 30 }
+                            coords: { x: 55, y: 25 }
                         },
                         {
-                            name: "ספה מודרנית רחבה",
-                            price: "₪350",
-                            url: "https://www.aliexpress.com/w/wholesale-modern-sofa.html",
-                            icon: "🛋️",
-                            coords: { x: 50, y: 55 }
+                            name: "כרבולית סרוגה עבה אפורה",
+                            price: "$45.99",
+                            url: "https://www.aliexpress.com/item/1005007387488589.html",
+                            icon: "🧣",
+                            coords: { x: 70, y: 55 }
                         },
                         {
                             name: "שולחן קפה מעץ טבעי",
-                            price: "₪280",
+                            price: "$89.50",
                             url: "https://www.aliexpress.com/w/wholesale-modern-wood-coffee-table.html",
                             icon: "☕",
-                            coords: { x: 43, y: 72 }
+                            coords: { x: 45, y: 75 }
                         },
                         {
-                            name: "שטיח שאגי לבן ורך",
-                            price: "₪120",
+                            name: "שטיח שאגי לבן רך",
+                            price: "$65.00",
                             url: "https://www.aliexpress.com/w/wholesale-plush-white-area-rug.html",
                             icon: "🧶",
-                            coords: { x: 40, y: 85 }
+                            coords: { x: 35, y: 85 }
                         },
                         {
-                            name: "סט 3 כדים קרמיים",
-                            price: "₪70",
-                            url: "http://www.aliexpress.com/w/wholesale-ceramic-vase-sets.html",
+                            name: "סט כדים קרמיים לבן",
+                            price: "$28.75",
+                            url: "https://www.aliexpress.com/w/wholesale-ceramic-vase-sets.html",
                             icon: "🏺",
-                            coords: { x: 11, y: 54 }
+                            coords: { x: 75, y: 50 }
                         },
                         {
-                            name: "כרבולית סרוגה עבה",
-                            price: "₪60",
-                            url: "https://www.aliexpress.com/i/1005007387488589.html",
-                            icon: "🧣",
-                            coords: { x: 78, y: 60 }
+                            name: "ספה מודרנית בצבע בז׳",
+                            price: "$299.00",
+                            url: "https://www.aliexpress.com/w/wholesale-modern-sofa.html",
+                            icon: "🛋️",
+                            coords: { x: 65, y: 65 }
                         }
                     ]
                 }
