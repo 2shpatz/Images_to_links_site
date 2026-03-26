@@ -6,7 +6,7 @@
 let currentCategory = null;
 
 // ============ INIT ============
-document.addEventListener('DOMContentLoaded', async () => {
+async function initSite() {
     // Try loading data from API, fall back to static data.js
     await loadSiteData();
 
@@ -21,7 +21,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     initFadeIn();
     initHeaderScroll();
     initOrbParallax();
-});
+}
+
+// Script is at bottom of <body>, so DOM is already parsed.
+// Use readyState check for safety in case of dynamic loading.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initSite());
+} else {
+    initSite();
+}
 
 // ============ LOAD DATA FROM API ============
 async function loadSiteData() {

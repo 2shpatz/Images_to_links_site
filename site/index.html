@@ -207,27 +207,6 @@
 </footer>
 
 <script src="assets/js/data.js"></script>
-<script>
-// Try loading live data from API (KV), fall back to static data.js
-(async function loadLiveData() {
-    try {
-        const resp = await fetch('/api/data');
-        if (resp.ok) {
-            const liveData = await resp.json();
-            if (liveData.categories && liveData.categories.length > 0) {
-                window.SITE_DATA = liveData;
-                console.log('Loaded live data from API ✓');
-            }
-        }
-    } catch (e) {
-        console.log('Using static data.js (API not available)');
-    }
-})().then(() => {
-    // Load main script after data is ready
-    const s = document.createElement('script');
-    s.src = 'assets/js/script.js';
-    document.body.appendChild(s);
-});
-</script>
+<script src="assets/js/script.js"></script>
 </body>
 </html>
