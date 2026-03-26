@@ -111,6 +111,37 @@ const SITE_DATA = {
                             icon: "🌡️"
                         }
                     ]
+                },
+                {
+                    file: "annotated-kitchen.jpg",
+                    title: "מטבח מודרני עם מוצרים נבחרים",
+                    description: "מטבח מעוצב עם פריטים שניתן למצוא ב-AliExpress, כולל סימונים על התמונה",
+                    products: [
+                        {
+                            name: "קומקום חשמלי מעוצב שחור מט",
+                            price: "₪180",
+                            url: "https://www.aliexpress.com/item/1005009283926938.html",
+                            icon: "🫖"
+                        },
+                        {
+                            name: "סט צנצנות תבלינים עם מעמד עץ",
+                            price: "₪95",
+                            url: "https://www.aliexpress.com/item/1005009886221452.html",
+                            icon: "🧂"
+                        },
+                        {
+                            name: "דיספנסר שמן זכוכית מעוצב",
+                            price: "₪35",
+                            url: "https://www.aliexpress.com/item/1005008182446725.html",
+                            icon: "🧴"
+                        },
+                        {
+                            name: "פס מגנטי לסכינים מפלדת אל-חלד",
+                            price: "₪65",
+                            url: "https://www.aliexpress.com/item/1005009394802008.html",
+                            icon: "🔪"
+                        }
+                    ]
                 }
             ]
         },
