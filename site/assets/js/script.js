@@ -30,8 +30,23 @@ async function loadSiteData() {
         if (resp.ok) {
             const data = await resp.json();
             if (data && data.categories && data.categories.length > 0) {
-                // Replace static SITE_DATA with API data
-                SITE_DATA.categories = data.categories;
+                // Merge API data into static SITE_DATA
+                data.categories.forEach(apiCat => {
+                    const staticCat = SITE_DATA.categories.find(c => c.id === apiCat.id);
+                    if (staticCat) {
+                        // Add images from API that aren't in static data
+                        if (apiCat.images && apiCat.images.length > 0) {
+                            apiCat.images.forEach(apiImg => {
+                                if (!staticCat.images.find(i => i.file === apiImg.file)) {
+                                    staticCat.images.push(apiImg);
+                                }
+                            });
+                        }
+                    } else {
+                        // New category from API
+                        SITE_DATA.categories.push(apiCat);
+                    }
+                });
             }
         }
     } catch (e) {
