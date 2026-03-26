@@ -6,7 +6,10 @@
 let currentCategory = null;
 
 // ============ INIT ============
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Try loading data from API, fall back to static data.js
+    await loadSiteData();
+
     buildNavTabs();
     buildCategoryTabs();
 
@@ -19,6 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeaderScroll();
     initOrbParallax();
 });
+
+// ============ LOAD DATA FROM API ============
+async function loadSiteData() {
+    try {
+        const resp = await fetch('/api/data');
+        if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.categories && data.categories.length > 0) {
+                // Replace static SITE_DATA with API data
+                SITE_DATA.categories = data.categories;
+            }
+        }
+    } catch (e) {
+        // API unavailable – use static data.js fallback
+        console.log('API unavailable, using static data.js');
+    }
+}
 
 // ============ BUILD NAV TABS ============
 function buildNavTabs() {
@@ -129,11 +149,13 @@ function renderGallery(categoryId) {
         card.className = 'gallery-card';
         card.addEventListener('click', () => openModal(img));
 
-        const imgPath = `images/${img.categoryId}/${img.file}`;
+        // Try static path first, then API-served image from KV
+        const staticPath = `images/${img.categoryId}/${img.file}`;
+        const apiPath = `/api/images/${img.categoryId}/${img.file}`;
 
         card.innerHTML = `
-            <img class="gallery-card-image" src="${imgPath}" alt="${img.title}"
-                 onerror="this.src='data:image/svg+xml,${encodeURIComponent(placeholderSVG(img.title))}'" loading="lazy" />
+            <img class="gallery-card-image" src="${staticPath}" alt="${img.title}"
+                 onerror="if(this.dataset.tried){this.src='data:image/svg+xml,${encodeURIComponent(placeholderSVG(img.title))}';}else{this.dataset.tried='1';this.src='${apiPath}';}" loading="lazy" />
             <div class="gallery-card-body">
                 <div class="gallery-card-title">${img.title}</div>
                 <div class="gallery-card-count">
@@ -172,10 +194,16 @@ function openModal(imageData) {
     const modalDesc = document.getElementById('modal-description');
     const modalProducts = document.getElementById('modal-products');
 
-    const imgPath = `images/${imageData.categoryId}/${imageData.file}`;
-    modalImg.src = imgPath;
+    const staticPath = `images/${imageData.categoryId}/${imageData.file}`;
+    const apiPath = `/api/images/${imageData.categoryId}/${imageData.file}`;
+    modalImg.src = staticPath;
     modalImg.onerror = function() {
-        this.src = `data:image/svg+xml,${encodeURIComponent(placeholderSVG(imageData.title))}`;
+        if (!this.dataset.tried) {
+            this.dataset.tried = '1';
+            this.src = apiPath;
+        } else {
+            this.src = `data:image/svg+xml,${encodeURIComponent(placeholderSVG(imageData.title))}`;
+        }
     };
     modalTitle.textContent = imageData.title;
     modalDesc.textContent = imageData.description;
