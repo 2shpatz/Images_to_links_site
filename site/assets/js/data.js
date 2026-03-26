@@ -195,6 +195,37 @@ const SITE_DATA = {
                             icon: "🕐"
                         }
                     ]
+                },
+                {
+                    file: "modern-living-room.jpg",
+                    title: "סלון מודרני ונעים",
+                    description: "עיצוב סלון מודרני עם מגוון פריטים מעוצבים מ-AliExpress",
+                    products: [
+                        {
+                            name: "מנורת עמידה מינימליסטית שחורה",
+                            price: "₪350",
+                            url: "https://www.aliexpress.com/item/1005010352775247.html",
+                            icon: "💡"
+                        },
+                        {
+                            name: "סט כדים קרמיים דקורטיביים",
+                            price: "₪85",
+                            url: "https://www.aliexpress.com/item/1005006614170710.html",
+                            icon: "🏺"
+                        },
+                        {
+                            name: "כרבולית סרוגה עבה ונעימה",
+                            price: "₪75",
+                            url: "https://www.aliexpress.com/item/1005008182446725.html",
+                            icon: "🧶"
+                        },
+                        {
+                            name: "אמנות קיר גיאומטרית מודרנית",
+                            price: "₪120",
+                            url: "https://www.aliexpress.com/item/1005006022670486.html",
+                            icon: "🖼️"
+                        }
+                    ]
                 }
             ]
         }
