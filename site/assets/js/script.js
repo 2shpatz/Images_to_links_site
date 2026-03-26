@@ -359,4 +359,12 @@ function initOrbParallax() {
     }
 }
 
+// ============ FULLSCREEN TOGGLE ============
+function toggleFullscreen() {
+    const modal = document.getElementById('modal');
+    const btn = document.getElementById('fullscreen-btn');
+    modal.classList.toggle('fullscreen');
+    btn.textContent = modal.classList.contains('fullscreen') ? '⛵' : '⛶';
+}
+
 console.log('מציאות מהתמונה loaded ✨');

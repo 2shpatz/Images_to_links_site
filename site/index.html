@@ -148,8 +148,9 @@
 
 <!-- ==================== PRODUCT MODAL ==================== -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal" id="modal" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="closeModal()" aria-label="סגור">&times;</button>
+        <button class="modal-fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()" aria-label="מסך מלא" title="מסך מלא">⛶</button>
         <div class="modal-body">
             <div class="modal-image-wrap">
                 <img id="modal-image" src="" alt="תמונת מוצר" />

@@ -860,3 +860,70 @@ footer {
         padding: 0.4rem 0.9rem;
     }
 }
+
+
+/* ============ FULLSCREEN MODAL ============ */
+.modal-fullscreen-btn {
+    position: absolute;
+    top: 1rem;
+    right: 3.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: rgba(232, 89, 12, 0.15);
+    border: 1px solid var(--border-color);
+    color: var(--accent-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2010;
+}
+
+.modal-fullscreen-btn:hover {
+    background: var(--accent-primary);
+    color: #fff;
+    box-shadow: var(--shadow-md);
+}
+
+.modal.fullscreen {
+    position: fixed;
+    inset: 0;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal.fullscreen .modal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+.modal.fullscreen .modal-image-wrap {
+    flex: 1;
+    max-height: none;
+    border-radius: 0;
+}
+
+.modal.fullscreen .modal-info {
+    display: none;
+}
+
+.modal.fullscreen .modal-fullscreen-btn::after {
+    content: '⛶';
+}
+
+@media (max-width: 768px) {
+    .modal-fullscreen-btn {
+        right: 2.5rem;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+}
