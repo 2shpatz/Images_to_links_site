@@ -152,7 +152,7 @@ const SITE_DATA = {
                         {
                             name: "KINGROON PETG 3D Printer Filament",
                             price: "₪150",
-                            url: "https://www.aliexpress.com/item/example-3d.html",
+                            url: "https://www.aliexpress.com/item/1005004895787583.html",
                             icon: "🖨️"
                         }
                     ]
@@ -163,9 +163,9 @@ const SITE_DATA = {
                     description: "תחנת מזג אוויר ניידת עם חיבור Wifi",
                     products: [
                         {
-                            name: "Small Portable Smart Wifi Weather Station",
+                            name: "GeekMagic Ultra Portable Smart Wifi Weather Station",
                             price: "₪7",
-                            url: "https://www.aliexpress.com/item/example-weather.html",
+                            url: "https://www.aliexpress.com/item/1005006966276512.html",
                             icon: "🌡️"
                         }
                     ]

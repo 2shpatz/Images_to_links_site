@@ -23,10 +23,9 @@ async function initSite() {
     initOrbParallax();
 }
 
-// Script is at bottom of <body>, so DOM is already parsed.
-// Use readyState check for safety in case of dynamic loading.
+// Check readyState instead of DOMContentLoaded
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initSite());
+    document.addEventListener('DOMContentLoaded', initSite);
 } else {
     initSite();
 }
@@ -38,7 +37,7 @@ async function loadSiteData() {
         if (resp.ok) {
             const data = await resp.json();
             if (data && data.categories && data.categories.length > 0) {
-                // Merge API data into static SITE_DATA
+                // Merge API data into static SITE_DATA by matching category IDs
                 data.categories.forEach(apiCat => {
                     const staticCat = SITE_DATA.categories.find(c => c.id === apiCat.id);
                     if (staticCat) {
