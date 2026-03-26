@@ -37,21 +37,21 @@ const SITE_DATA = {
             icon: "👶",
             images: [
                 {
-                    file: "nursery-room.jpg",
+                    file: "baby-room.jpg",
                     title: "חדר תינוקות מעוצב",
-                    description: "חדר ילדים מעוצב עם פריטים שניתן למצוא ב-AliExpress",
+                    description: "מוצרים משלימים לחדר התינוק",
                     products: [
                         {
-                            name: "מנורת לילה LED לחדר ילדים",
-                            price: "₪25–45",
-                            url: "https://www.aliexpress.com/item/example1.html",
-                            icon: "💡"
+                            name: "מנורת לילה ענן",
+                            price: "₪25–40",
+                            url: "https://www.aliexpress.com/item/example9.html",
+                            icon: "☁️"
                         },
                         {
-                            name: "מדבקות קיר דקורטיביות",
-                            price: "₪10–30",
-                            url: "https://www.aliexpress.com/item/example2.html",
-                            icon: "🎨"
+                            name: "סט מצעים לתינוק",
+                            price: "₪60–120",
+                            url: "https://www.aliexpress.com/item/example10.html",
+                            icon: "🛏️"
                         },
                         {
                             name: "ארגונית צעצועים מבד",
@@ -77,6 +77,37 @@ const SITE_DATA = {
                             price: "₪50–90",
                             url: "https://www.aliexpress.com/item/example5.html",
                             icon: "🎒"
+                        }
+                    ]
+                },
+                {
+                    file: "annotated-nursery.jpg",
+                    title: "חדר תינוקות מודרני ורחב",
+                    description: "מבט רחב על חדר תינוקות מעוצב עם פריטים נבחרים מ-AliExpress",
+                    products: [
+                        {
+                            name: "מיטת תינוק מעץ אורן טבעי",
+                            price: "₪1,250",
+                            url: "https://www.aliexpress.com/item/1005007129769976.html",
+                            icon: "🛏️"
+                        },
+                        {
+                            name: "שטיח ענן רך ופרוותי",
+                            price: "₪45",
+                            url: "https://www.aliexpress.com/item/1005007980084828.html",
+                            icon: "☁️"
+                        },
+                        {
+                            name: "כיסא נדנדה ראטן מעוצב",
+                            price: "₪1,650",
+                            url: "https://www.aliexpress.com/item/1005009148075112.html",
+                            icon: "🪑"
+                        },
+                        {
+                            name: "סט מדפי ענן דקורטיביים",
+                            price: "₪85",
+                            url: "https://www.aliexpress.com/item/1005006821107202.html",
+                            icon: "☁️"
                         }
                     ]
                 }
