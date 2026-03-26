@@ -143,6 +143,32 @@ const SITE_DATA = {
                             icon: "💡"
                         }
                     ]
+                },
+                {
+                    file: "3d-printer-filament.jpg",
+                    title: "פילמנט PETG למדפסת תלת-ממד",
+                    description: "פילמנט איכותי של KINGROON במחיר מבצע מטורף",
+                    products: [
+                        {
+                            name: "KINGROON PETG 3D Printer Filament",
+                            price: "₪150",
+                            url: "https://www.aliexpress.com/item/example-3d.html",
+                            icon: "🖨️"
+                        }
+                    ]
+                },
+                {
+                    file: "weather-station.jpg",
+                    title: "תחנת מזג אוויר חכמה",
+                    description: "תחנת מזג אוויר ניידת עם חיבור Wifi",
+                    products: [
+                        {
+                            name: "Small Portable Smart Wifi Weather Station",
+                            price: "₪7",
+                            url: "https://www.aliexpress.com/item/example-weather.html",
+                            icon: "🌡️"
+                        }
+                    ]
                 }
             ]
         },
