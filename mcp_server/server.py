@@ -48,7 +48,7 @@ API_BASE = f"{SITE_URL}/api"
 
 mcp = FastMCP(
     "aliexpress-deals",
-    description="Manage images and AliExpress product links for the מציאות מהתמונה site (remote API)",
+    instructions="Manage images and AliExpress product links for the מציאות מהתמונה site (remote API)",
 )
 
 # ── HTTP helpers ───────────────────────────────────────────────────
