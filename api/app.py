@@ -42,11 +42,17 @@ app.add_middleware(
 
 
 # ── Pydantic models ───────────────────────────────────────────────
+class Coords(BaseModel):
+    x: float
+    y: float
+
+
 class Product(BaseModel):
     name: str
     price: str
     url: str
     icon: str = "🛒"
+    coords: Optional[Coords] = None
 
 
 class ImageEntry(BaseModel):
@@ -62,15 +68,17 @@ class CategoryCreate(BaseModel):
     icon: str = "📁"
 
 
-class AddProductRequest(BaseModel):
-    category_id: str
-    image_file: str
-    product: Product
+class UpdateImageEntry(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 
-class AddImageEntryRequest(BaseModel):
-    category_id: str
-    image: ImageEntry
+class UpdateProduct(BaseModel):
+    name: Optional[str] = None
+    price: Optional[str] = None
+    url: Optional[str] = None
+    icon: Optional[str] = None
+    coords: Optional[Coords] = None
 
 
 # ── data.js read/write helpers ────────────────────────────────────
@@ -296,6 +304,26 @@ def delete_image(category_id: str, image_file: str, delete_file: bool = True):
     return {"status": "deleted", "image": image_file}
 
 
+# ── Update image entry ─────────────────────────────────────────────
+@app.put("/api/categories/{category_id}/images/{image_file}")
+def update_image(category_id: str, image_file: str, req: UpdateImageEntry):
+    """Update an image entry's title or description."""
+    data = read_data()
+    cat = find_category(data, category_id)
+    if not cat:
+        raise HTTPException(404, f"Category '{category_id}' not found")
+    img = find_image(cat, image_file)
+    if not img:
+        raise HTTPException(404, f"Image '{image_file}' not found in '{category_id}'")
+
+    if req.title is not None:
+        img["title"] = req.title
+    if req.description is not None:
+        img["description"] = req.description
+    write_data(data)
+    return {"status": "updated", "image": img}
+
+
 # ── Products ───────────────────────────────────────────────────────
 @app.get("/api/categories/{category_id}/images/{image_file}/products")
 def list_products(category_id: str, image_file: str):
@@ -324,6 +352,37 @@ def add_product(category_id: str, image_file: str, product: Product):
     img["products"].append(product.model_dump())
     write_data(data)
     return {"status": "added", "product": product.model_dump(), "total_products": len(img["products"])}
+
+
+@app.put("/api/categories/{category_id}/images/{image_file}/products/{product_index}")
+def update_product(category_id: str, image_file: str, product_index: int, req: UpdateProduct):
+    """Update a product by index."""
+    data = read_data()
+    cat = find_category(data, category_id)
+    if not cat:
+        raise HTTPException(404, f"Category '{category_id}' not found")
+    img = find_image(cat, image_file)
+    if not img:
+        raise HTTPException(404, f"Image '{image_file}' not found")
+
+    products = img.get("products", [])
+    if product_index < 0 or product_index >= len(products):
+        raise HTTPException(404, f"Product index {product_index} out of range (0–{len(products) - 1})")
+
+    product = products[product_index]
+    if req.name is not None:
+        product["name"] = req.name
+    if req.price is not None:
+        product["price"] = req.price
+    if req.url is not None:
+        product["url"] = req.url
+    if req.icon is not None:
+        product["icon"] = req.icon
+    if req.coords is not None:
+        product["coords"] = req.coords.model_dump()
+
+    write_data(data)
+    return {"status": "updated", "product": product}
 
 
 @app.delete("/api/categories/{category_id}/images/{image_file}/products/{product_index}")

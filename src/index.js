@@ -290,6 +290,24 @@ async function handleAPI(path, method, request, kv) {
         return jsonResponse({ status: 'deleted', image: imageFile });
     }
 
+    // ── PUT /api/categories/:id/images/:file ───────────
+    if (singleImageMatch && method === 'PUT') {
+        const categoryId = decodeURIComponent(singleImageMatch[1]);
+        const imageFile = decodeURIComponent(singleImageMatch[2]);
+        const data = await getData(kv);
+        const cat = findCategory(data, categoryId);
+        if (!cat) return errorResponse(`Category '${categoryId}' not found`, 404);
+
+        const img = findImage(cat, imageFile);
+        if (!img) return errorResponse(`Image '${imageFile}' not found in '${categoryId}'`, 404);
+
+        const body = await request.json();
+        if (body.title !== undefined) img.title = body.title;
+        if (body.description !== undefined) img.description = body.description;
+        await setData(kv, data);
+        return jsonResponse({ status: 'updated', image: img });
+    }
+
     // ── GET /api/categories/:id/images/:file/products ────
     const productsMatch = path.match(/^\/api\/categories\/([^/]+)\/images\/([^/]+)\/products$/);
     if (productsMatch && method === 'GET') {
@@ -314,12 +332,13 @@ async function handleAPI(path, method, request, kv) {
         if (!img) return errorResponse(`Image '${imageFile}' not found in '${categoryId}'`, 404);
 
         const body = await request.json();
-        const { name, price, url: productUrl, icon = '🛒' } = body;
+        const { name, price, url: productUrl, icon = '🛒', coords } = body;
         if (!name || !price || !productUrl) {
             return errorResponse('Missing required fields: name, price, url');
         }
 
         const product = { name, price, url: productUrl, icon };
+        if (coords) product.coords = coords;
         img.products = img.products || [];
         img.products.push(product);
         await setData(kv, data);
@@ -347,6 +366,35 @@ async function handleAPI(path, method, request, kv) {
         const removed = products.splice(productIndex, 1)[0];
         await setData(kv, data);
         return jsonResponse({ status: 'deleted', removed_product: removed });
+    }
+
+    // ── PUT /api/categories/:id/images/:file/products/:index ──
+    const updateProductMatch = path.match(/^\/api\/categories\/([^/]+)\/images\/([^/]+)\/products\/(\d+)$/);
+    if (updateProductMatch && method === 'PUT') {
+        const categoryId = decodeURIComponent(updateProductMatch[1]);
+        const imageFile = decodeURIComponent(updateProductMatch[2]);
+        const productIndex = parseInt(updateProductMatch[3], 10);
+
+        const data = await getData(kv);
+        const cat = findCategory(data, categoryId);
+        if (!cat) return errorResponse(`Category '${categoryId}' not found`, 404);
+        const img = findImage(cat, imageFile);
+        if (!img) return errorResponse(`Image '${imageFile}' not found`, 404);
+
+        const products = img.products || [];
+        if (productIndex < 0 || productIndex >= products.length) {
+            return errorResponse(`Product index ${productIndex} out of range (0–${products.length - 1})`, 404);
+        }
+
+        const body = await request.json();
+        const product = products[productIndex];
+        if (body.name !== undefined) product.name = body.name;
+        if (body.price !== undefined) product.price = body.price;
+        if (body.url !== undefined) product.url = body.url;
+        if (body.icon !== undefined) product.icon = body.icon;
+        if (body.coords !== undefined) product.coords = body.coords;
+        await setData(kv, data);
+        return jsonResponse({ status: 'updated', product });
     }
 
     // ── Not found ────────────────────────────────────────

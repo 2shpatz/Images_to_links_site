@@ -76,6 +76,13 @@ def _api_delete(path: str) -> dict:
     return resp.json()
 
 
+def _api_put(path: str, body: dict) -> dict:
+    """PUT JSON to the site API."""
+    resp = _client.put(f"{API_BASE}{path}", json=body)
+    resp.raise_for_status()
+    return resp.json()
+
+
 # ── MCP Tools ──────────────────────────────────────────────────────
 
 @mcp.tool()
@@ -203,6 +210,8 @@ def add_product(
     price: str,
     url: str,
     icon: str = "🛒",
+    coords_x: float | None = None,
+    coords_y: float | None = None,
 ) -> str:
     """
     Add an AliExpress product link to an image entry.
@@ -214,13 +223,13 @@ def add_product(
         price: Price range string (e.g. "₪15–30").
         url: Full AliExpress product URL (affiliate link).
         icon: Emoji icon for the product (e.g. "💡").
+        coords_x: Hotspot X position as percentage (0–100). Where the product is in the image.
+        coords_y: Hotspot Y position as percentage (0–100). Where the product is in the image.
     """
-    result = _api_post(f"/categories/{category_id}/images/{image_file}/products", {
-        "name": name,
-        "price": price,
-        "url": url,
-        "icon": icon,
-    })
+    body = {"name": name, "price": price, "url": url, "icon": icon}
+    if coords_x is not None and coords_y is not None:
+        body["coords"] = {"x": coords_x, "y": coords_y}
+    result = _api_post(f"/categories/{category_id}/images/{image_file}/products", body)
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
@@ -235,6 +244,72 @@ def remove_product(category_id: str, image_file: str, product_index: int) -> str
         product_index: Zero-based index of the product to remove.
     """
     result = _api_delete(f"/categories/{category_id}/images/{image_file}/products/{product_index}")
+    return json.dumps(result, ensure_ascii=False, indent=2)
+
+
+@mcp.tool()
+def update_image_entry(
+    category_id: str,
+    image_file: str,
+    title: str | None = None,
+    description: str | None = None,
+) -> str:
+    """
+    Update an existing image entry's title or description.
+
+    Args:
+        category_id: The category containing the image.
+        image_file: The image filename to update.
+        title: New Hebrew title (leave empty to keep current).
+        description: New Hebrew description (leave empty to keep current).
+    """
+    body = {}
+    if title is not None:
+        body["title"] = title
+    if description is not None:
+        body["description"] = description
+    result = _api_put(f"/categories/{category_id}/images/{image_file}", body)
+    return json.dumps(result, ensure_ascii=False, indent=2)
+
+
+@mcp.tool()
+def update_product(
+    category_id: str,
+    image_file: str,
+    product_index: int,
+    name: str | None = None,
+    price: str | None = None,
+    url: str | None = None,
+    icon: str | None = None,
+    coords_x: float | None = None,
+    coords_y: float | None = None,
+) -> str:
+    """
+    Update an existing product on an image.
+
+    Args:
+        category_id: The category containing the image.
+        image_file: The image filename.
+        product_index: Zero-based index of the product to update.
+        name: New Hebrew product name (leave empty to keep current).
+        price: New price string (leave empty to keep current).
+        url: New AliExpress URL (leave empty to keep current).
+        icon: New emoji icon (leave empty to keep current).
+        coords_x: New hotspot X position as percentage (0–100).
+        coords_y: New hotspot Y position as percentage (0–100).
+    """
+    body = {}
+    if name is not None:
+        body["name"] = name
+    if price is not None:
+        body["price"] = price
+    if url is not None:
+        body["url"] = url
+    if icon is not None:
+        body["icon"] = icon
+    if coords_x is not None and coords_y is not None:
+        body["coords"] = {"x": coords_x, "y": coords_y}
+    result = _api_put(f"/categories/{category_id}/images/{image_file}/products/{product_index}", body)
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
