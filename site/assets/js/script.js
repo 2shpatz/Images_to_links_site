@@ -306,9 +306,16 @@ function closeModal(event) {
     document.body.style.overflow = '';
 }
 
-// Close modal on Escape
+// Close modal/preview on Escape
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') {
+        const preview = document.getElementById('image-preview-overlay');
+        if (preview.classList.contains('open')) {
+            preview.classList.remove('open');
+        } else {
+            closeModal();
+        }
+    }
 });
 
 // ============ SMOOTH SCROLL ============
@@ -359,12 +366,18 @@ function initOrbParallax() {
     }
 }
 
-// ============ FULLSCREEN TOGGLE ============
-function toggleFullscreen() {
-    const modal = document.getElementById('modal');
-    const btn = document.getElementById('fullscreen-btn');
-    modal.classList.toggle('fullscreen');
-    btn.textContent = modal.classList.contains('fullscreen') ? '⛵' : '⛶';
+// ============ IMAGE PREVIEW ============
+function openImagePreview() {
+    const modalImg = document.getElementById('modal-image');
+    const preview = document.getElementById('image-preview-overlay');
+    const previewImg = document.getElementById('preview-image');
+    previewImg.src = modalImg.src;
+    preview.classList.add('open');
+}
+
+function closeImagePreview(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('image-preview-overlay').classList.remove('open');
 }
 
 console.log('מציאות מהתמונה loaded ✨');

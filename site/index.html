@@ -150,7 +150,7 @@
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal" id="modal" onclick="event.stopPropagation()">
         <button class="modal-close" onclick="closeModal()" aria-label="סגור">&times;</button>
-        <button class="modal-fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()" aria-label="מסך מלא" title="מסך מלא">⛶</button>
+        <button class="modal-preview-btn" id="preview-btn" onclick="openImagePreview()" aria-label="תצוגה מוגדלת" title="תצוגה מוגדלת">🔍</button>
         <div class="modal-body">
             <div class="modal-image-wrap">
                 <img id="modal-image" src="" alt="תמונת מוצר" />
@@ -165,6 +165,11 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- ==================== IMAGE PREVIEW OVERLAY ==================== -->
+<div class="image-preview-overlay" id="image-preview-overlay" onclick="closeImagePreview(event)">
+    <img id="preview-image" src="" alt="תצוגה מוגדלת" />
 </div>
 
 <!-- ==================== HOW IT WORKS ==================== -->

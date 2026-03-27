@@ -862,8 +862,8 @@ footer {
 }
 
 
-/* ============ FULLSCREEN MODAL ============ */
-.modal-fullscreen-btn {
+/* ============ IMAGE PREVIEW BUTTON ============ */
+.modal-preview-btn {
     position: absolute;
     top: 1rem;
     right: 3.5rem;
@@ -882,48 +882,53 @@ footer {
     z-index: 2010;
 }
 
-.modal-fullscreen-btn:hover {
+.modal-preview-btn:hover {
     background: var(--accent-primary);
     color: #fff;
     box-shadow: var(--shadow-md);
 }
 
-.modal.fullscreen {
+/* ============ IMAGE PREVIEW OVERLAY ============ */
+.image-preview-overlay {
     position: fixed;
     inset: 0;
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal.fullscreen .modal-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-}
-
-.modal.fullscreen .modal-image-wrap {
-    flex: 1;
-    max-height: none;
-    border-radius: 0;
-}
-
-.modal.fullscreen .modal-info {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    z-index: 3000;
     display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    cursor: zoom-out;
 }
 
-.modal.fullscreen .modal-fullscreen-btn::after {
-    content: '⛶';
+.image-preview-overlay.open {
+    display: flex;
+}
+
+.image-preview-overlay img {
+    max-width: 85vw;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: preview-zoom-in 0.25s ease;
+}
+
+@keyframes preview-zoom-in {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 @media (max-width: 768px) {
-    .modal-fullscreen-btn {
+    .modal-preview-btn {
         right: 2.5rem;
         width: 36px;
         height: 36px;
         font-size: 1rem;
+    }
+
+    .image-preview-overlay {
+        padding: 1.5rem;
     }
 }
