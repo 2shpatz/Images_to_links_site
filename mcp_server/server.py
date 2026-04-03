@@ -1,11 +1,24 @@
 """
 MCP Server for מציאות מהתמונה (AliExpress Deals) site.
 
-This server talks to the Cloudflare-hosted API to manage the site remotely.
-No local file access needed — works from anywhere.
+═══════════════════════════════════════════════════════════════════
+LOCAL-FILE ARCHITECTURE — Images & data are stored as CODE, not DB.
+═══════════════════════════════════════════════════════════════════
 
-Set SITE_URL env var to your Cloudflare Pages domain, e.g.:
-    export ALIEXPRESS_SITE_URL="https://images-to-links-site.ohadshpindel.workers.dev"
+This server manages the site by reading/writing LOCAL files:
+  • site/assets/js/data.js  — product & image metadata (the source of truth)
+  • site/images/<category>/  — image files
+
+After making changes, commit & push to GitHub. Cloudflare Pages
+auto-deploys from git within ~1 minute.
+
+IMPORTANT FOR AI AGENTS:
+  After using upload_image or any data-modifying tool, you MUST run:
+    git add site/ && git commit -m "Add content" && git push
+  to make changes live and permanent.
+
+Set SITE_DIR env var to point to the site/ folder. Example:
+    export SITE_DIR="/path/to/landing_pages/aliexpress_deals/site"
 
 Run with:
     python -m mcp_server
@@ -18,72 +31,149 @@ Configure in MCP clients:
                 "args": ["-m", "mcp_server"],
                 "cwd": "/path/to/landing_pages/aliexpress_deals",
                 "env": {
-                    "SITE_URL": "https://images-to-links-site.ohadshpindel.workers.dev"
+                    "SITE_DIR": "/path/to/landing_pages/aliexpress_deals/site"
                 }
             }
         }
     }
 """
 
+import base64
 import json
 import os
+import re
+import shutil
+from pathlib import Path
 
-import httpx
 from mcp.server.fastmcp import FastMCP
 
 # ── Configuration ──────────────────────────────────────────────────
-SITE_URL = os.environ.get(
-    "SITE_URL",
-    os.environ.get("ALIEXPRESS_SITE_URL", "")
-).rstrip("/")
+# Resolve SITE_DIR: explicit env, or fall back to <cwd>/site
+_default_site_dir = str(Path.cwd() / "site")
+SITE_DIR = Path(os.environ.get("SITE_DIR", _default_site_dir))
+DATA_JS_PATH = SITE_DIR / "assets" / "js" / "data.js"
+IMAGES_DIR = SITE_DIR / "images"
 
-if not SITE_URL:
+if not DATA_JS_PATH.exists():
     raise RuntimeError(
-        "SITE_URL (or ALIEXPRESS_SITE_URL) env var is required. "
-        "Set it to your Cloudflare Pages URL, e.g.: "
-        "https://images-to-links-site.ohadshpindel.workers.dev"
+        f"data.js not found at {DATA_JS_PATH}. "
+        f"Set SITE_DIR env var to the site/ folder, e.g.: "
+        f"export SITE_DIR=/path/to/landing_pages/aliexpress_deals/site"
     )
-
-API_BASE = f"{SITE_URL}/api"
 
 mcp = FastMCP(
     "aliexpress-deals",
-    instructions="Manage images and AliExpress product links for the מציאות מהתמונה site (remote API)",
+    instructions=(
+        "Manage images and AliExpress product links for the מציאות מהתמונה site.\n"
+        "All changes are saved to LOCAL FILES (data.js + site/images/).\n"
+        "After making changes, commit & push to git to deploy.\n"
+        "NEVER store images in a database — always as files in git."
+    ),
 )
 
-# ── HTTP helpers ───────────────────────────────────────────────────
-_client = httpx.Client(timeout=30.0)
+
+# ── data.js read / write ──────────────────────────────────────────
+def _read_data() -> dict:
+    """Parse SITE_DATA from data.js → Python dict."""
+    if not DATA_JS_PATH.exists():
+        return {"categories": []}
+
+    text = DATA_JS_PATH.read_text(encoding="utf-8")
+    match = re.search(r"const\s+SITE_DATA\s*=\s*(\{.*\})\s*;?\s*$", text, re.DOTALL)
+    if not match:
+        raise ValueError("Could not parse data.js — const SITE_DATA = {...} not found")
+
+    js_obj = match.group(1)
+    # JS → valid JSON
+    js_obj = re.sub(r'(?<!:)//.*', '', js_obj)                    # single-line comments (not URLs like https://)
+    js_obj = re.sub(r"/\*.*?\*/", "", js_obj, flags=re.DOTALL)   # multi-line comments
+    js_obj = re.sub(r'(?<=[{,\n])\s*(\w+)\s*:', r' "\1":', js_obj)  # unquoted keys
+    js_obj = re.sub(r",\s*([}\]])", r"\1", js_obj)               # trailing commas
+
+    return json.loads(js_obj)
 
 
-def _api_get(path: str) -> dict | list:
-    """GET request to the site API."""
-    resp = _client.get(f"{API_BASE}{path}")
-    resp.raise_for_status()
-    return resp.json()
+def _write_data(data: dict) -> None:
+    """Write data dict back to data.js preserving the AI-agent instruction header."""
+    # Read current file to preserve everything before 'const SITE_DATA'
+    current = DATA_JS_PATH.read_text(encoding="utf-8")
+    header_match = re.search(r"(const\s+SITE_DATA\s*=)", current)
+    if header_match:
+        header = current[: header_match.start()]
+    else:
+        header = ""
+
+    json_str = json.dumps(data, ensure_ascii=False, indent=4)
+    DATA_JS_PATH.write_text(
+        f"{header}const SITE_DATA = {json_str};\n",
+        encoding="utf-8",
+    )
 
 
-def _api_post(path: str, body: dict) -> dict:
-    """POST JSON to the site API."""
-    resp = _client.post(f"{API_BASE}{path}", json=body)
-    resp.raise_for_status()
-    return resp.json()
+# ── Helpers ────────────────────────────────────────────────────────
+def _find_category(data: dict, category_id: str) -> dict | None:
+    for cat in data["categories"]:
+        if cat["id"] == category_id:
+            return cat
+    return None
 
 
-def _api_delete(path: str) -> dict:
-    """DELETE request to the site API."""
-    resp = _client.delete(f"{API_BASE}{path}")
-    resp.raise_for_status()
-    return resp.json()
+def _find_image(category: dict, image_file: str) -> dict | None:
+    for img in category.get("images", []):
+        if img["file"] == image_file:
+            return img
+    return None
 
 
-def _api_put(path: str, body: dict) -> dict:
-    """PUT JSON to the site API."""
-    resp = _client.put(f"{API_BASE}{path}", json=body)
-    resp.raise_for_status()
-    return resp.json()
+def _ensure_category_dir(category_id: str) -> Path:
+    d = IMAGES_DIR / category_id
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 # ── MCP Tools ──────────────────────────────────────────────────────
+
+@mcp.tool()
+def get_site_data() -> str:
+    """
+    Get the full site data (all categories, images, and products).
+    Useful for understanding current state before making changes.
+    Data is read from the local data.js file — this is the source of truth.
+    """
+    data = _read_data()
+    return json.dumps(data, ensure_ascii=False, indent=2)
+
+
+@mcp.tool()
+def get_site_info() -> str:
+    """
+    Get info about the local site files: paths, categories, image counts,
+    and which image files exist on disk.
+    """
+    data = _read_data()
+    categories_info = []
+    for cat in data.get("categories", []):
+        cat_dir = IMAGES_DIR / cat["id"]
+        disk_files = sorted(f.name for f in cat_dir.iterdir() if f.is_file()) if cat_dir.exists() else []
+        data_files = [img["file"] for img in cat.get("images", [])]
+        categories_info.append({
+            "id": cat["id"],
+            "label": cat["label"],
+            "icon": cat["icon"],
+            "images_in_data": len(data_files),
+            "files_on_disk": len(disk_files),
+            "disk_files": disk_files,
+            "data_files": data_files,
+        })
+
+    return json.dumps({
+        "site_dir": str(SITE_DIR),
+        "data_js_path": str(DATA_JS_PATH),
+        "images_dir": str(IMAGES_DIR),
+        "total_categories": len(data.get("categories", [])),
+        "categories": categories_info,
+    }, ensure_ascii=False, indent=2)
+
 
 @mcp.tool()
 def list_categories() -> str:
@@ -91,7 +181,16 @@ def list_categories() -> str:
     List all categories on the site with their image counts.
     Returns a JSON array of categories.
     """
-    result = _api_get("/categories")
+    data = _read_data()
+    result = [
+        {
+            "id": cat["id"],
+            "label": cat["label"],
+            "icon": cat["icon"],
+            "image_count": len(cat.get("images", [])),
+        }
+        for cat in data["categories"]
+    ]
     return json.dumps(result, ensure_ascii=False, indent=2)
 
 
@@ -99,26 +198,46 @@ def list_categories() -> str:
 def create_category(category_id: str, label: str, icon: str = "📁") -> str:
     """
     Create a new category for organizing images.
+    Creates the category in data.js AND the images/<category_id>/ folder.
 
     Args:
-        category_id: Unique ID (used as folder name, e.g. "pets", "sports"). ASCII only.
+        category_id: Unique ID (used as folder name, e.g. "pets", "sports"). ASCII lowercase, hyphens ok.
         label: Hebrew display name (e.g. "חיות מחמד")
         icon: Emoji icon for the tab (e.g. "🐾")
     """
-    result = _api_post("/categories", {"id": category_id, "label": label, "icon": icon})
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    if _find_category(data, category_id):
+        return json.dumps({"error": f"Category '{category_id}' already exists"})
+
+    data["categories"].append(
+        {"id": category_id, "label": label, "icon": icon, "images": []}
+    )
+    _ensure_category_dir(category_id)
+    _write_data(data)
+    return json.dumps({"status": "created", "category": category_id})
 
 
 @mcp.tool()
 def delete_category(category_id: str) -> str:
     """
-    Delete a category and all its images.
+    Delete a category, its data entries, and its image files from disk.
 
     Args:
         category_id: The category ID to delete.
     """
-    result = _api_delete(f"/categories/{category_id}")
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    data["categories"] = [c for c in data["categories"] if c["id"] != category_id]
+
+    cat_dir = IMAGES_DIR / category_id
+    if cat_dir.exists():
+        shutil.rmtree(cat_dir)
+
+    _write_data(data)
+    return json.dumps({"status": "deleted", "category": category_id})
 
 
 @mcp.tool()
@@ -129,8 +248,11 @@ def list_images(category_id: str) -> str:
     Args:
         category_id: The category to list images from.
     """
-    result = _api_get(f"/categories/{category_id}/images")
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+    return json.dumps(cat.get("images", []), ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
@@ -143,25 +265,65 @@ def upload_image(
 ) -> str:
     """
     Upload an image (as base64) to a category and create a data entry.
+    The image is saved as a FILE in site/images/<category_id>/<filename>.
     Products can be added afterward with add_product.
-    The image will be stored in Cloudflare KV and served from the API.
+
+    IMPORTANT: After uploading, commit & push to git to make permanent:
+      git add site/ && git commit -m "Add <title>" && git push
 
     Args:
         category_id: Target category ID (e.g. "parenting", "kitchen").
         title: Hebrew title for the image entry.
-        filename: Desired filename (e.g. "my-photo.jpg").
-        image_data_base64: The image file content encoded as base64 string.
+        filename: Desired filename (e.g. "my-photo.jpg"). Lowercase, hyphens, no spaces.
+        image_data_base64: The image file content encoded as a base64 string.
         description: Hebrew description of the image.
     """
-    result = _api_post(f"/categories/{category_id}/images/upload", {
-        "file": filename,
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found. Create it first with create_category."})
+
+    # Validate filename
+    safe_name = re.sub(r"[^\w\-.]", "_", filename)
+    ext = Path(safe_name).suffix.lower()
+    if ext not in {".jpg", ".jpeg", ".png", ".webp"}:
+        return json.dumps({"error": f"Unsupported file type: {ext}. Use .jpg, .png, or .webp"})
+
+    # Decode and save image file
+    try:
+        image_bytes = base64.b64decode(image_data_base64)
+    except Exception as e:
+        return json.dumps({"error": f"Invalid base64 data: {e}"})
+
+    cat_dir = _ensure_category_dir(category_id)
+    dest = cat_dir / safe_name
+
+    # Avoid overwriting
+    counter = 1
+    stem = Path(safe_name).stem
+    while dest.exists():
+        safe_name = f"{stem}_{counter}{ext}"
+        dest = cat_dir / safe_name
+        counter += 1
+
+    dest.write_bytes(image_bytes)
+
+    # Add entry to data.js
+    image_entry = {
+        "file": safe_name,
         "title": title,
         "description": description,
-        "image_base64": image_data_base64,
-    })
-    if result.get("image_url"):
-        result["full_image_url"] = f"{SITE_URL}{result['image_url']}"
-    return json.dumps(result, ensure_ascii=False, indent=2)
+        "products": [],
+    }
+    cat["images"].append(image_entry)
+    _write_data(data)
+
+    return json.dumps({
+        "status": "uploaded",
+        "image": image_entry,
+        "file_path": f"site/images/{category_id}/{safe_name}",
+        "reminder": "Run: git add site/ && git commit -m 'Add image' && git push",
+    }, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
@@ -172,34 +334,65 @@ def add_image_entry(
     description: str = "",
 ) -> str:
     """
-    Add a data entry for an image. Use when the image is already available
-    at a known URL or in the images/ directory.
+    Add a data entry for an image that already exists in site/images/<category_id>/.
+    Use this when the image file is already on disk but missing from data.js.
 
     Args:
         category_id: Target category ID.
-        file: Image filename or path.
+        file: Image filename (must already exist in site/images/<category_id>/).
         title: Hebrew title for the image.
         description: Hebrew description.
     """
-    result = _api_post(f"/categories/{category_id}/images", {
-        "file": file,
-        "title": title,
-        "description": description,
-    })
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    if _find_image(cat, file):
+        return json.dumps({"error": f"Image entry '{file}' already exists in '{category_id}'"})
+
+    # Verify the file exists on disk
+    file_path = IMAGES_DIR / category_id / file
+    if not file_path.exists():
+        return json.dumps({
+            "error": f"Image file not found at {file_path}. Upload it first with upload_image.",
+            "expected_path": str(file_path),
+        })
+
+    entry = {"file": file, "title": title, "description": description, "products": []}
+    cat["images"].append(entry)
+    _write_data(data)
+    return json.dumps({"status": "added", "image": entry}, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
-def delete_image(category_id: str, image_file: str) -> str:
+def delete_image(category_id: str, image_file: str, delete_file: bool = True) -> str:
     """
-    Delete an image entry and its stored image data.
+    Delete an image entry from data.js and optionally the image file from disk.
 
     Args:
         category_id: The category containing the image.
         image_file: The image filename to delete.
+        delete_file: Also delete the file from disk (default: True).
     """
-    result = _api_delete(f"/categories/{category_id}/images/{image_file}")
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    img = _find_image(cat, image_file)
+    if not img:
+        return json.dumps({"error": f"Image '{image_file}' not found in '{category_id}'"})
+
+    cat["images"] = [i for i in cat["images"] if i["file"] != image_file]
+
+    if delete_file:
+        file_path = IMAGES_DIR / category_id / image_file
+        if file_path.exists():
+            file_path.unlink()
+
+    _write_data(data)
+    return json.dumps({"status": "deleted", "image": image_file})
 
 
 @mcp.tool()
@@ -215,22 +408,38 @@ def add_product(
 ) -> str:
     """
     Add an AliExpress product link to an image entry.
+    The product will be shown as a clickable hotspot on the image.
 
     Args:
         category_id: The category containing the image.
         image_file: The image filename to add the product to.
         name: Hebrew product name (e.g. "מנורת לילה LED").
-        price: Price range string (e.g. "₪15–30").
-        url: Full AliExpress product URL (affiliate link).
+        price: Price string (e.g. "$15.30" or "₪15–30").
+        url: Full AliExpress product URL (affiliate link preferred).
         icon: Emoji icon for the product (e.g. "💡").
-        coords_x: Hotspot X position as percentage (0–100). Where the product is in the image.
-        coords_y: Hotspot Y position as percentage (0–100). Where the product is in the image.
+        coords_x: Hotspot X position as percentage (0–100). Where the product appears in the image.
+        coords_y: Hotspot Y position as percentage (0–100). Where the product appears in the image.
     """
-    body = {"name": name, "price": price, "url": url, "icon": icon}
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    img = _find_image(cat, image_file)
+    if not img:
+        return json.dumps({"error": f"Image '{image_file}' not found in '{category_id}'"})
+
+    product = {"name": name, "price": price, "url": url, "icon": icon}
     if coords_x is not None and coords_y is not None:
-        body["coords"] = {"x": coords_x, "y": coords_y}
-    result = _api_post(f"/categories/{category_id}/images/{image_file}/products", body)
-    return json.dumps(result, ensure_ascii=False, indent=2)
+        product["coords"] = {"x": coords_x, "y": coords_y}
+
+    img["products"].append(product)
+    _write_data(data)
+    return json.dumps({
+        "status": "added",
+        "product": product,
+        "total_products": len(img["products"]),
+    }, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
@@ -243,8 +452,22 @@ def remove_product(category_id: str, image_file: str, product_index: int) -> str
         image_file: The image filename.
         product_index: Zero-based index of the product to remove.
     """
-    result = _api_delete(f"/categories/{category_id}/images/{image_file}/products/{product_index}")
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    img = _find_image(cat, image_file)
+    if not img:
+        return json.dumps({"error": f"Image '{image_file}' not found in '{category_id}'"})
+
+    products = img.get("products", [])
+    if product_index < 0 or product_index >= len(products):
+        return json.dumps({"error": f"Product index {product_index} out of range (0–{len(products) - 1})"})
+
+    removed = products.pop(product_index)
+    _write_data(data)
+    return json.dumps({"status": "deleted", "removed_product": removed}, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
@@ -263,13 +486,22 @@ def update_image_entry(
         title: New Hebrew title (leave empty to keep current).
         description: New Hebrew description (leave empty to keep current).
     """
-    body = {}
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    img = _find_image(cat, image_file)
+    if not img:
+        return json.dumps({"error": f"Image '{image_file}' not found in '{category_id}'"})
+
     if title is not None:
-        body["title"] = title
+        img["title"] = title
     if description is not None:
-        body["description"] = description
-    result = _api_put(f"/categories/{category_id}/images/{image_file}", body)
-    return json.dumps(result, ensure_ascii=False, indent=2)
+        img["description"] = description
+
+    _write_data(data)
+    return json.dumps({"status": "updated", "image": img}, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
@@ -298,61 +530,40 @@ def update_product(
         coords_x: New hotspot X position as percentage (0–100).
         coords_y: New hotspot Y position as percentage (0–100).
     """
-    body = {}
+    data = _read_data()
+    cat = _find_category(data, category_id)
+    if not cat:
+        return json.dumps({"error": f"Category '{category_id}' not found"})
+
+    img = _find_image(cat, image_file)
+    if not img:
+        return json.dumps({"error": f"Image '{image_file}' not found in '{category_id}'"})
+
+    products = img.get("products", [])
+    if product_index < 0 or product_index >= len(products):
+        return json.dumps({"error": f"Product index {product_index} out of range (0–{len(products) - 1})"})
+
+    product = products[product_index]
     if name is not None:
-        body["name"] = name
+        product["name"] = name
     if price is not None:
-        body["price"] = price
+        product["price"] = price
     if url is not None:
-        body["url"] = url
+        product["url"] = url
     if icon is not None:
-        body["icon"] = icon
+        product["icon"] = icon
     if coords_x is not None and coords_y is not None:
-        body["coords"] = {"x": coords_x, "y": coords_y}
-    result = _api_put(f"/categories/{category_id}/images/{image_file}/products/{product_index}", body)
-    return json.dumps(result, ensure_ascii=False, indent=2)
+        product["coords"] = {"x": coords_x, "y": coords_y}
 
-
-@mcp.tool()
-def get_site_data() -> str:
-    """
-    Get the full site data (all categories, images, and products).
-    Useful for understanding current state before making changes.
-    """
-    data = _api_get("/data")
-    return json.dumps({"site_url": SITE_URL, "data": data}, ensure_ascii=False, indent=2)
-
-
-@mcp.tool()
-def get_site_info() -> str:
-    """
-    Get info about the site: live URL, health status, and stats.
-    Useful to verify the MCP server is correctly configured.
-    """
-    try:
-        health = _api_get("/health")
-    except Exception as e:
-        return json.dumps({
-            "site_url": SITE_URL,
-            "api_base": API_BASE,
-            "status": "error",
-            "error": str(e),
-        }, ensure_ascii=False, indent=2)
-
-    return json.dumps({
-        "site_url": SITE_URL,
-        "api_base": API_BASE,
-        "status": health.get("status", "unknown"),
-        "total_categories": health.get("categories", 0),
-        "total_images": health.get("total_images", 0),
-    }, ensure_ascii=False, indent=2)
+    _write_data(data)
+    return json.dumps({"status": "updated", "product": product}, ensure_ascii=False, indent=2)
 
 
 @mcp.tool()
 def seed_data(data_json: str) -> str:
     """
-    Seed the site with initial data (replaces all existing data).
-    Use carefully — this overwrites everything.
+    Replace ALL site data with the provided JSON. Use carefully — this
+    overwrites every category, image entry, and product in data.js.
 
     Args:
         data_json: Full SITE_DATA JSON string with a "categories" array.
@@ -365,8 +576,8 @@ def seed_data(data_json: str) -> str:
     if "categories" not in data:
         return json.dumps({"error": "JSON must contain a 'categories' array"})
 
-    result = _api_post("/data/seed", data)
-    return json.dumps(result, ensure_ascii=False, indent=2)
+    _write_data(data)
+    return json.dumps({"status": "seeded", "categories": len(data["categories"])})
 
 
 # ── Run ────────────────────────────────────────────────────────────

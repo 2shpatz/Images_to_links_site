@@ -97,8 +97,8 @@ def read_data() -> dict:
     json_str = match.group(1)
 
     # JS → JSON: add quotes to unquoted keys, handle trailing commas
-    # Replace single-line comments
-    json_str = re.sub(r"//.*", "", json_str)
+    # Replace single-line comments (but not URLs like https://)
+    json_str = re.sub(r"(?<!:)//.*", "", json_str)
     # Replace multi-line comments
     json_str = re.sub(r"/\*.*?\*/", "", json_str, flags=re.DOTALL)
     # Quote unquoted keys: word: → "word":

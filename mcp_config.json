@@ -5,8 +5,7 @@
             "args": ["-m", "mcp_server"],
             "cwd": "/home/shpatz/projects/landing_pages/aliexpress_deals",
             "env": {
-                "SITE_DIR": "/home/shpatz/projects/landing_pages/aliexpress_deals/site",
-                "SITE_URL": "${ALIEXPRESS_SITE_URL}"
+                "SITE_DIR": "/home/shpatz/projects/landing_pages/aliexpress_deals/site"
             }
         }
     }
