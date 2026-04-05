@@ -6,10 +6,9 @@
 let currentCategory = null;
 
 // ============ INIT ============
-async function initSite() {
-    // Try loading data from API, fall back to static data.js
-    await loadSiteData();
-
+// All data comes from static data.js (the single source of truth).
+// No API fetch — images and products are deployed as code via git.
+function initSite() {
     buildNavTabs();
     buildCategoryTabs();
 
@@ -28,38 +27,6 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSite);
 } else {
     initSite();
-}
-
-// ============ LOAD DATA FROM API ============
-async function loadSiteData() {
-    try {
-        const resp = await fetch('/api/data');
-        if (resp.ok) {
-            const data = await resp.json();
-            if (data && data.categories && data.categories.length > 0) {
-                // Merge API data into static SITE_DATA by matching category IDs
-                data.categories.forEach(apiCat => {
-                    const staticCat = SITE_DATA.categories.find(c => c.id === apiCat.id);
-                    if (staticCat) {
-                        // Add images from API that aren't in static data
-                        if (apiCat.images && apiCat.images.length > 0) {
-                            apiCat.images.forEach(apiImg => {
-                                if (!staticCat.images.find(i => i.file === apiImg.file)) {
-                                    staticCat.images.push(apiImg);
-                                }
-                            });
-                        }
-                    } else {
-                        // New category from API
-                        SITE_DATA.categories.push(apiCat);
-                    }
-                });
-            }
-        }
-    } catch (e) {
-        // API unavailable – use static data.js fallback
-        console.log('API unavailable, using static data.js');
-    }
 }
 
 // ============ BUILD NAV TABS ============
@@ -171,13 +138,12 @@ function renderGallery(categoryId) {
         card.className = 'gallery-card';
         card.addEventListener('click', () => openModal(img));
 
-        // Try static path first, then API-served image from KV
+        // Image served as static file from images/<category>/<file>
         const staticPath = `images/${img.categoryId}/${img.file}`;
-        const apiPath = `/api/images/${img.categoryId}/${img.file}`;
 
         card.innerHTML = `
             <img class="gallery-card-image" src="${staticPath}" alt="${img.title}"
-                 onerror="if(this.dataset.tried){this.src='data:image/svg+xml,${encodeURIComponent(placeholderSVG(img.title))}';}else{this.dataset.tried='1';this.src='${apiPath}';}" loading="lazy" />
+                 onerror="this.src='data:image/svg+xml,${encodeURIComponent(placeholderSVG(img.title))}';" loading="lazy" />
             <div class="gallery-card-body">
                 <div class="gallery-card-title">${img.title}</div>
                 <div class="gallery-card-count">
@@ -217,15 +183,9 @@ function openModal(imageData) {
     const modalProducts = document.getElementById('modal-products');
 
     const staticPath = `images/${imageData.categoryId}/${imageData.file}`;
-    const apiPath = `/api/images/${imageData.categoryId}/${imageData.file}`;
     modalImg.src = staticPath;
     modalImg.onerror = function() {
-        if (!this.dataset.tried) {
-            this.dataset.tried = '1';
-            this.src = apiPath;
-        } else {
-            this.src = `data:image/svg+xml,${encodeURIComponent(placeholderSVG(imageData.title))}`;
-        }
+        this.src = `data:image/svg+xml,${encodeURIComponent(placeholderSVG(imageData.title))}`;
     };
     modalTitle.textContent = imageData.title;
     modalDesc.textContent = imageData.description;
