@@ -299,6 +299,80 @@ const SITE_DATA = {
                     ]
                 }
             ]
+        },
+        {
+            "id": "parenting",
+            "label": "חדר תינוק",
+            "icon": "🍼",
+            "images": [
+                {
+                    "file": "cozy-nursery-room.png",
+                    "title": "חדר תינוק מעוצב ומודרני",
+                    "description": "חדר תינוק סקנדינבי חמים עם עיצוב פסטלי, ריהוט עץ טבעי ופריטים מקסימים לתינוק.",
+                    "products": [
+                        {
+                            "name": "מנורת לילה LED בצורת ירח וגלקסיה",
+                            "price": "₪3.17",
+                            "url": "https://he.aliexpress.com/item/1005007273995598.html",
+                            "icon": "🌙",
+                            "coords": {
+                                "x": 15,
+                                "y": 30
+                            }
+                        },
+                        {
+                            "name": "מובייל בובות רכות תלוי לעריסה",
+                            "price": "₪14.55",
+                            "url": "https://he.aliexpress.com/item/1005007168414935.html",
+                            "icon": "🧸",
+                            "coords": {
+                                "x": 60,
+                                "y": 15
+                            }
+                        },
+                        {
+                            "name": "מובייל מוזיקלי לעריסה עם מקרן כוכבים ושלט רחוק",
+                            "price": "₪57.24",
+                            "url": "https://he.aliexpress.com/item/1005006210230524.html",
+                            "icon": "⭐",
+                            "coords": {
+                                "x": 55,
+                                "y": 5
+                            }
+                        },
+                        {
+                            "name": "משטח EVA רך לרצפה בדוגמת עלים – 4 חלקים",
+                            "price": "₪26.30",
+                            "url": "https://he.aliexpress.com/item/1005006996285747.html",
+                            "icon": "🌿",
+                            "coords": {
+                                "x": 45,
+                                "y": 85
+                            }
+                        },
+                        {
+                            "name": "מדבקת קיר טבלת גובה ג׳ירף לחדר ילדים",
+                            "price": "₪9.28",
+                            "url": "https://he.aliexpress.com/item/1005007038234910.html",
+                            "icon": "🦒",
+                            "coords": {
+                                "x": 85,
+                                "y": 40
+                            }
+                        },
+                        {
+                            "name": "תאורת לילה LED אלחוטית עם חיישן תנועה",
+                            "price": "₪6.48",
+                            "url": "https://he.aliexpress.com/item/1005006860874836.html",
+                            "icon": "💡",
+                            "coords": {
+                                "x": 20,
+                                "y": 55
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
