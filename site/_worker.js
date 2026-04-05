@@ -257,22 +257,13 @@ async function handleAPI(path, method, request, kv) {
     }
 
     // ── GET /api/images/:category/:file ──────────────────
+    // Redirect to static file path — images are served from site/images/
     const imageServeMatch = path.match(/^\/api\/images\/([^/]+)\/(.+)$/);
     if (imageServeMatch && method === 'GET') {
         const categoryId = decodeURIComponent(imageServeMatch[1]);
         const fileName = decodeURIComponent(imageServeMatch[2]);
-        const kvKey = `image:${categoryId}/${fileName}`;
-
-        const { value, metadata } = await kv.getWithMetadata(kvKey, { type: 'arrayBuffer' });
-        if (!value) return errorResponse('Image not found', 404);
-
-        return new Response(value, {
-            headers: {
-                'Content-Type': (metadata && metadata.contentType) || 'image/jpeg',
-                'Cache-Control': 'public, max-age=86400',
-                'Access-Control-Allow-Origin': '*',
-            },
-        });
+        const staticUrl = new URL(`/images/${categoryId}/${fileName}`, request.url);
+        return Response.redirect(staticUrl.toString(), 301);
     }
 
     // ── DELETE /api/categories/:id/images/:file ──────────
