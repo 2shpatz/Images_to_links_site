@@ -61,124 +61,10 @@
 const SITE_DATA = {
     "categories": [
         {
-            "id": "home",
-            "label": "בית ועיצוב",
-            "icon": "🏠",
-            "images": [
-                {
-                    "file": "perfect-match-living-room.jpg",
-                    "title": "סלון מודרני מינימליסטי",
-                    "description": "סלון מעוצב עם 7 פריטים מ-AliExpress שנבחרו בקפידה ויוצרו לתמונה זו",
-                    "products": [
-                        {
-                            "name": "מנורת עמידה LED ספירלה",
-                            "price": "$50.56",
-                            "url": "https://www.aliexpress.com/item/1005009692606690.html",
-                            "icon": "💡",
-                            "coords": {
-                                "x": 18,
-                                "y": 50
-                            }
-                        },
-                        {
-                            "name": "שעון קיר נורדי זהב ושחור",
-                            "price": "$31.30",
-                            "url": "https://www.aliexpress.com/item/1005008525381412.html",
-                            "icon": "🕐",
-                            "coords": {
-                                "x": 55,
-                                "y": 25
-                            }
-                        },
-                        {
-                            "name": "כרבולית סרוגה עבה אפורה",
-                            "price": "$45.99",
-                            "url": "https://www.aliexpress.com/item/1005007387488589.html",
-                            "icon": "🧣",
-                            "coords": {
-                                "x": 70,
-                                "y": 55
-                            }
-                        },
-                        {
-                            "name": "שולחן קפה מעץ טבעי",
-                            "price": "$89.50",
-                            "url": "https://www.aliexpress.com/w/wholesale-modern-wood-coffee-table.html",
-                            "icon": "☕",
-                            "coords": {
-                                "x": 45,
-                                "y": 75
-                            }
-                        },
-                        {
-                            "name": "שטיח שאגי לבן רך",
-                            "price": "$65.00",
-                            "url": "https://www.aliexpress.com/w/wholesale-plush-white-area-rug.html",
-                            "icon": "🧶",
-                            "coords": {
-                                "x": 35,
-                                "y": 85
-                            }
-                        },
-                        {
-                            "name": "סט כדים קרמיים לבן",
-                            "price": "$28.75",
-                            "url": "https://www.aliexpress.com/w/wholesale-ceramic-vase-sets.html",
-                            "icon": "🏺",
-                            "coords": {
-                                "x": 75,
-                                "y": 50
-                            }
-                        },
-                        {
-                            "name": "ספה מודרנית בצבע בז׳",
-                            "price": "$299.00",
-                            "url": "https://www.aliexpress.com/w/wholesale-modern-sofa.html",
-                            "icon": "🛋️",
-                            "coords": {
-                                "x": 65,
-                                "y": 65
-                            }
-                        }
-                    ]
-                },
-                {
-                    "file": "modern-living-room.jpg",
-                    "title": "סלון מודרני חם",
-                    "description": "חלל מגורים מעוצב עם פריטים לרכישה מ-AliExpress",
-                    "products": []
-                },
-                {
-                    "file": "wide-living-room.jpg",
-                    "title": "סלון רחב ומרווח",
-                    "description": "תמונת סלון פנורמית עם מוצרים מ-AliExpress",
-                    "products": []
-                },
-                {
-                    "file": "wide-living-room-clean.jpg",
-                    "title": "סלון מינימליסטי נקי",
-                    "description": "סלון נקי ומסודר עם פריטי עיצוב לרכישה",
-                    "products": []
-                },
-                {
-                    "file": "annotated-living-room.jpg",
-                    "title": "סלון מעוצב עם סימונים",
-                    "description": "סלון עם פריטים מסומנים לרכישה ישירה",
-                    "products": []
-                }
-            ]
-        },
-        {
             "id": "kitchen",
             "label": "מטבח",
             "icon": "🍳",
             "images": [
-                {
-                    "file": "annotated-kitchen.jpg",
-                    "title": "מטבח מודרני מאובזר",
-                    "description": "מטבח מעוצב עם כלים וגאדג׳טים לרכישה מ-AliExpress",
-                    "products": []
-                },
                 {
                     "file": "kitchen_room_final.jpg",
                     "title": "מטבח מודרני ומעוצב",
@@ -255,25 +141,6 @@ const SITE_DATA = {
                             }
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "id": "gadgets",
-            "label": "גאדג׳טים",
-            "icon": "🔧",
-            "images": [
-                {
-                    "file": "3d-printer-filament.jpg",
-                    "title": "מדפסת תלת מימד וחומרים",
-                    "description": "ציוד הדפסת תלת מימד זמין ב-AliExpress",
-                    "products": []
-                },
-                {
-                    "file": "weather-station.jpg",
-                    "title": "תחנת מזג אוויר ביתית",
-                    "description": "גאדג׳ט מזג אוויר חכם לבית מ-AliExpress",
-                    "products": []
                 }
             ]
         },
@@ -422,93 +289,6 @@ const SITE_DATA = {
                             }
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "id": "home-office",
-            "label": "משרד ביתי",
-            "icon": "💼",
-            "images": [
-                {
-                    "file": "home-office-v1.png",
-                    "title": "משרד ביתי מודרני ומעוצב",
-                    "description": "סביבת עבודה ארגונומית ומעוררת השראה לשיפור הפרודוקטיביות בבית.",
-                    "products": [
-                        {
-                            "name": "שולחן עבודה קומפקטי מודרני",
-                            "price": "₪561.31",
-                            "url": "https://www.aliexpress.com/item/1005008519687981.html",
-                            "icon": "💻",
-                            "coords": {
-                                "x": 50,
-                                "y": 75
-                            }
-                        },
-                        {
-                            "name": "כיסא משרדי ארגונומי",
-                            "price": "₪665.27",
-                            "url": "https://www.aliexpress.com/item/1005008196060222.html",
-                            "icon": "🪑",
-                            "coords": {
-                                "x": 15,
-                                "y": 80
-                            }
-                        },
-                        {
-                            "name": "מעמד למסך עם מגירה",
-                            "price": "₪238.58",
-                            "url": "https://www.aliexpress.com/item/1005009481102235.html",
-                            "icon": "🖥️",
-                            "coords": {
-                                "x": 55,
-                                "y": 55
-                            }
-                        },
-                        {
-                            "name": "מנורת שולחן ספירלה LED",
-                            "price": "₪36.25",
-                            "url": "https://www.aliexpress.com/item/1005009692606690.html",
-                            "icon": "💡",
-                            "coords": {
-                                "x": 32,
-                                "y": 45
-                            }
-                        },
-                        {
-                            "name": "משטח שולחן מעור PU",
-                            "price": "₪23.84",
-                            "url": "https://www.aliexpress.com/item/1005007096432815.html",
-                            "icon": "⬛",
-                            "coords": {
-                                "x": 50,
-                                "y": 65
-                            }
-                        },
-                        {
-                            "name": "נורת ריחוף מגנטית",
-                            "price": "₪138.84",
-                            "url": "https://www.aliexpress.com/item/1005006727508946.html",
-                            "icon": "🪄",
-                            "coords": {
-                                "x": 75,
-                                "y": 45
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "parenting",
-            "label": "הורות",
-            "icon": "👶",
-            "images": [
-                {
-                    "file": "annotated-nursery.jpg",
-                    "title": "חדר תינוק מעוצב",
-                    "description": "חדר ילדים עם פריטים מומלצים מ-AliExpress",
-                    "products": []
                 }
             ]
         }
