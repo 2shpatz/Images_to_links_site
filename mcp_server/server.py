@@ -14,8 +14,11 @@ auto-deploys from git within ~1 minute.
 
 IMPORTANT FOR AI AGENTS:
   After using upload_image or any data-modifying tool, you MUST run:
+    cd /home/shpatz/projects/landing_pages/aliexpress_deals
     git add site/ && git commit -m "Add content" && git push
-  to make changes live and permanent.
+    npx wrangler deploy
+  All three steps are required! git push alone does NOT deploy.
+  The site is a Cloudflare Worker, not Pages.
 
 Set SITE_DIR env var to point to the site/ folder. Example:
     export SITE_DIR="/path/to/landing_pages/aliexpress_deals/site"
@@ -268,8 +271,13 @@ def upload_image(
     The image is saved as a FILE in site/images/<category_id>/<filename>.
     Products can be added afterward with add_product.
 
-    IMPORTANT: After uploading, commit & push to git to make permanent:
-      git add site/ && git commit -m "Add <title>" && git push
+    IMPORTANT — Full workflow to add a new entry:
+      1. Call upload_image (this tool) to save image + create data entry
+      2. Call add_product (once per product) to attach AliExpress links
+      3. Deploy: run these commands in terminal:
+           git add site/ && git commit -m "Add <title>" && git push
+           npx wrangler deploy
+         Both git push AND wrangler deploy are required!
 
     Args:
         category_id: Target category ID (e.g. "parenting", "kitchen").
@@ -322,7 +330,7 @@ def upload_image(
         "status": "uploaded",
         "image": image_entry,
         "file_path": f"site/images/{category_id}/{safe_name}",
-        "reminder": "Run: git add site/ && git commit -m 'Add image' && git push",
+        "reminder": "Run: git add site/ && git commit -m 'Add image' && git push && npx wrangler deploy",
     }, ensure_ascii=False, indent=2)
 
 

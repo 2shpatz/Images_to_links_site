@@ -5,55 +5,63 @@
  *
  * ⚠️  THIS FILE IS THE SINGLE SOURCE OF TRUTH FOR ALL SITE CONTENT.
  *     Images and product data defined here are PERMANENT – they are
- *     deployed as static code via GitHub → Cloudflare Pages.
+ *     deployed as static code via GitHub + Cloudflare Workers.
  *
  * ═══════════════════════════════════════════════════════════════════
- * 🤖 AI AGENT INSTRUCTIONS — HOW TO ADD NEW CONTENT
+ * 🤖 AI AGENT INSTRUCTIONS — HOW TO ADD A NEW ENTRY
  * ═══════════════════════════════════════════════════════════════════
  *
- * STEP 1 — Save the image file:
- *   Place the image in:  site/images/<category_id>/<filename>.jpg
- *   Example:             site/images/parenting/cozy-nursery.jpg
- *   Supported formats:   .jpg, .jpeg, .png, .webp
- *   Keep filenames lowercase, use hyphens (no spaces).
+ * OPTION A — Using MCP tools (RECOMMENDED for AI agents):
+ *   1. Call `upload_image` with category_id, title, filename,
+ *      image_data_base64, and description.
+ *      → This saves the image to site/images/<category>/<file>
+ *        AND adds the entry to this data.js file automatically.
+ *   2. Call `add_product` once per product to attach AliExpress links
+ *      with hotspot coordinates to the image.
+ *   3. Deploy: run in terminal:
+ *      cd /home/shpatz/projects/landing_pages/aliexpress_deals
+ *      git add site/ && git commit -m "Add <title>" && git push
+ *      npx wrangler deploy
+ *   The MCP server name is "aliexpress-deals".
  *
- * STEP 2 — Add an entry in this file:
- *   Find (or create) the category in the SITE_DATA.categories array.
- *   Push a new object into that category's `images` array:
+ * OPTION B — Manual file editing:
+ *   1. Save image to:  site/images/<category_id>/<filename>.jpg
+ *      Formats: .jpg, .jpeg, .png, .webp. Lowercase, hyphens, no spaces.
+ *   2. Add entry in categories array below (see structure reference).
+ *   3. Deploy (same as step 3 above).
  *
+ * ENTRY STRUCTURE REFERENCE:
  *   {
- *       file: "cozy-nursery.jpg",              // filename only
- *       title: "חדר תינוק מעוצב",               // Hebrew title
- *       description: "תיאור קצר בעברית",         // Hebrew description
- *       products: [                             // AliExpress products
+ *       "file": "cozy-nursery.jpg",
+ *       "title": "חדר תינוק מעוצב",
+ *       "description": "תיאור קצר בעברית",
+ *       "products": [
  *           {
- *               name: "שם המוצר בעברית",
- *               price: "$XX.XX",
- *               url: "https://www.aliexpress.com/item/XXXXX.html",
- *               icon: "🍼",                     // emoji for the product
- *               coords: { x: 50, y: 50 }       // hotspot position (0-100%)
+ *               "name": "שם המוצר בעברית",
+ *               "price": "$XX.XX",
+ *               "url": "https://www.aliexpress.com/item/XXXXX.html",
+ *               "icon": "🍼",
+ *               "coords": { "x": 50, "y": 50 }
  *           }
  *       ]
  *   }
  *
- * STEP 3 — Commit & push:
- *   Both the image file AND this data.js change must be committed.
- *   git add site/images/<category_id>/<filename> site/assets/js/data.js
- *   git commit -m "Add new image: <title>"
- *   git push
- *   Cloudflare Pages will auto-deploy within ~1 minute.
- *
  * TO CREATE A NEW CATEGORY:
- *   Add an object to SITE_DATA.categories:
- *   { id: "pets", label: "חיות מחמד", icon: "🐾", images: [] }
- *   Then create the folder: site/images/pets/
+ *   MCP: call `create_category` with id, label, and icon.
+ *   Manual: add to array: { "id": "pets", "label": "חיות מחמד", "icon": "🐾", "images": [] }
+ *   Then create folder: site/images/pets/
+ *
+ * ⚠️  DEPLOYMENT — THREE STEPS REQUIRED:
+ *   1. git add site/ && git commit -m "<message>"
+ *   2. git push
+ *   3. npx wrangler deploy   ← THIS IS REQUIRED! git push alone does NOT deploy.
+ *   The site is a Cloudflare Worker (not Pages). Only `wrangler deploy` updates it.
  *
  * IMPORTANT RULES:
  *   - NEVER store images in a database or KV — always as files in git.
- *   - Every image file MUST have a matching entry in this file.
- *   - Every entry here MUST have a matching image file on disk.
- *   - Product coords {x, y} are percentages (0–100) from top-left.
- *   - Use the MCP tools (via mcp_server/) for guided content management.
+ *   - Every image MUST have at least 1 product with coords. No empty entries.
+ *   - Product coords {x, y} are percentages (0–100) from top-left of image.
+ *   - All text (title, description, product names) should be in Hebrew.
  *
  * ═══════════════════════════════════════════════════════════════════
  */
