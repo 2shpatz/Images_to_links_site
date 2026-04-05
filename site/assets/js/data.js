@@ -306,7 +306,7 @@ const SITE_DATA = {
             "icon": "🍼",
             "images": [
                 {
-                    "file": "cozy-nursery-room.png",
+                    "file": "cozy-nursery-room.jpg",
                     "title": "חדר תינוק מעוצב ומודרני",
                     "description": "חדר תינוק סקנדינבי חמים עם עיצוב פסטלי, ריהוט עץ טבעי ופריטים מקסימים לתינוק.",
                     "products": [
